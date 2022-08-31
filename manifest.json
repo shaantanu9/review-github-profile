@@ -1,0 +1,22 @@
+{
+  "name": "Review Github Profile Extension",
+  "description": "Review Github Profile on basis of pinned repositories, achievements, followings, and contributions.",
+  "homepage_url": "https://github.com/shaantanu9/review-github-profile",
+  "version": "2.0.0",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "Review Github Profile on basis of pinned repositories, achievements, followings, and contributions."
+  },
+  "content_scripts": [
+    {
+      "run_at": "document_idle",
+      "js": ["execute.js"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["tabs", "scripting"],
+  "host_permissions": ["https://*/*", "http://*/*"]
+}
