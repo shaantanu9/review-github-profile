@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "manifest_version": 3,
   "action": {
-    "default_title": "Review Github Profile on basis of pinned repositories, achievements, followings, and contributions."
+    "default_popup": "index.html"
   },
   "content_scripts": [
     {

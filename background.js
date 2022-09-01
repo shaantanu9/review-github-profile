@@ -2,10 +2,11 @@
 chrome.action.onClicked.addListener(execScript); // chrome.action is 
 
 async function execScript() {
+  // return (<>HTML</>)
   const tabId = await getTabId();
   chrome.scripting.executeScript({
     target: {tabId: tabId},
-    files: ['execute.js']
+    files: ['./index.html']
   })
 }
 

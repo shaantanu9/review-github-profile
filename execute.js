@@ -2,13 +2,20 @@
 (function () {
   // get page url
   var url = window.location.href;
-  // console.log(url, "url");
-  if (!url.startsWith("https://github.com/")) {
+  let splitUrl = url.split("/");
+  // console.log(url.split("/"), "url", url.split("/").length);
+  if (
+    !url.startsWith("https://github.com/") ||
+    splitUrl.length !== 4 ||
+    splitUrl[3].includes("?")
+  ) {
+    console.log("not a github Profile page");
     return;
   }
   let URLURL,
     USERNAME,
     SHORTINFO,
+    SHORTINFOLENGTH,
     LOCATION,
     WEBSITE,
     TWITTER,
@@ -44,10 +51,11 @@
   // get shortinfo of user from page
   // <div class="p-note user-profile-bio mb-3 js-user-profile-bio f4" data-bio-text="Tech Enthusiast who build clean scalable systems, and Open source Contributor want to build something that impact society in +ve way."><div>Tech Enthusiast who build clean scalable systems, and Open source Contributor want to build something that impact society in +ve way.</div></div>
   var shortinfo = document.querySelector(".p-note");
-  if (shortinfo == "") {
+  if (shortinfo == null) {
     SHORTINFO = "NOT AVAILABLE";
   } else {
     SHORTINFO = shortinfo.innerText;
+    SHORTINFOLENGTH = shortinfo.innerText.length;
   }
   // console.log(shortinfo.innerText, "shortinfo");
   // get shortinfo length
@@ -103,12 +111,14 @@
 
   // get user website from page
   // //*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[2]/div[3]/div[2]/ul/li[3]
-  const website = getElementByXpath(
-    '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[2]/div[3]/div[2]/ul/li[3]/a/text()'
+  // const website = getElementByXpath(
+  //   '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[2]/div[3]/div[2]/ul/li[3]/a/text()'
+  // )  ;
+  const website = document.querySelector(
+    'li[data-test-selector="profile-website-url"]'
   );
-  // console.log(website, "website");
   if (website != null) {
-    WEBSITE = website;
+    WEBSITE = website.innerText;
   } else {
     WEBSITE = "NOT AVAILABLE";
   }
@@ -116,10 +126,9 @@
   // =================================================================================================//
   // get user email from page
   // document.querySelector("#js-pjax-container > div.container-xl.px-3.px-md-4.px-lg-5 > div > div.Layout-sidebar > div > div.js-profile-editable-replace > div.d-flex.flex-column > div.js-profile-editable-area.d-flex.flex-column.d-md-block > ul > li:nth-child(4)")
-  const twitter = document.querySelectorAll('[itemprop="twitter"]').innerText;
-  console.log(twitter, "twitter2222");
-  if (twitter != null) {
-    TWITTER = twitter;
+  const twitter = document.querySelectorAll('[itemprop="twitter"]');
+  if (twitter != null && twitter.length > 0) {
+    TWITTER = twitter[0].innerText;
     // console.log(TWITTER, "111twitter222");
   } else {
     TWITTER = "NOT AVAILABLE";
@@ -132,15 +141,20 @@
   const organization2 = getElementByXpath(
     '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[2]/div[6]'
   );
-  if (organization2 != null) {
+  let organization3 = document.querySelectorAll(
+    '[data-hovercard-type="organization"]'
+  );
+  // console.log(organization3, "organization3");
+  organization3 = Array.from(organization3);
+  if (organization3 != null) {
     // loop over the xpath and convert to array
-    const organizationArray = Array.from(organization2.children);
-    organization = organizationArray.shift();
-    const organizationNumber = organizationArray.length;
+    const organizationNumber = organization3.length;
     const organizationArray2 = [];
 
-    organizationArray.map((item, index) => {
-      organizationArray2.push(item.ariaLabel);
+    organization3.map((item, index) => {
+      if (item.innerText != "") {
+        organizationArray2.push(item.innerText);
+      }
     });
     // console.log(organizationArray2, "organizationArray2");
     ORGANIZATIONLIST = organizationArray2;
@@ -242,9 +256,13 @@
     URLURL,
     USERNAME,
     SHORTINFO,
+    SHORTINFOLENGTH,
     LOCATION,
+    FOLLOWER,
+    FOLLOWING,
     WEBSITE,
     TWITTER,
+    ORGANIZATION,
     ORGANIZATIONLIST,
     PINNEDREPOSITPRIESNUMBER,
     PINNEDREPOSITPRIESDESCIPTIONLENGTH,
@@ -258,7 +276,7 @@
   // Save data to local storage
   (function saveData(data) {
     let stringifyData = JSON.stringify(data);
-    console.log(stringifyData, "stringifyData");
+    // console.log(stringifyData, "stringifyData");
     localStorage.setItem(`GithubProfileReview__${USERNAME}`, stringifyData);
     console.log("data Saved");
     data = null;
